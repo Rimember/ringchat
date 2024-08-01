@@ -408,6 +408,21 @@ def get_conversation_chain(llm, vectorstore) -> Runnable:
     return rag_chain
 
 
+def get_embedding_model() -> HuggingFaceEmbeddings:
+    """
+    Get the embedding model.
+
+    Returns:
+        HuggingFaceEmbeddings: The embedding model.
+    """
+    return HuggingFaceEmbeddings(
+        # TODO: Find a better model if available
+        model_name="jhgan/ko-sroberta-multitask",
+        model_kwargs={"device": "cpu"},  # or cuda
+        encode_kwargs={"normalize_embeddings": True},
+    )
+
+
 def get_vectorstore(text_chunks: List) -> Chroma:
     """
     Vectorize chunks of text and store them in a database.
@@ -418,13 +433,8 @@ def get_vectorstore(text_chunks: List) -> Chroma:
     Returns:
         Chroma: The created vector store.
     """
-    embeddings = HuggingFaceEmbeddings(
-        # TODO: Find a better model if available
-        model_name="jhgan/ko-sroberta-multitask",
-        model_kwargs={"device": "cpu"},  # or cuda
-        encode_kwargs={"normalize_embeddings": True},
-    )
 
+    embeddings = get_embedding_model()
     db = Chroma.from_documents(text_chunks, embeddings, persist_directory="./chroma_db")
     return db
 
