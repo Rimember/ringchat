@@ -17,6 +17,7 @@ langchain-openai = "^0.1.19"
 loguru = "^0.7.2"
 chromadb = "^0.5.5"
 protobuf = "^4.25.4"
+black = "^24.4.2"
 
 
 [build-system]
