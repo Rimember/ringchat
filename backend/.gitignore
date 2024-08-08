@@ -18,3 +18,6 @@ uploads
 
 # pycache
 __pycache__/
+
+# Wallet_MLDB(Oracle DB)
+Wallet_MLDB/
