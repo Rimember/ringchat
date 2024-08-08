@@ -1,13 +1,18 @@
 from fastapi import APIRouter
-from typing import Union
+from typing import Optional, Union
 from pydantic import BaseModel
 
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 from fastapi.responses import RedirectResponse
-from app.routers import crud, database, models, schema
-
+from app.routers import crud, schema
+from app import database
+from app.models import tables
 from typing import List
+
+from datetime import datetime, timedelta
+
+from app.models.tables import ChatRooms, Links, Vectors
 
 
 router = APIRouter(
@@ -15,41 +20,18 @@ router = APIRouter(
     tags=["chatrooms"]
 )
 
-# class Item(BaseModel):
-#     name: str
-#     description: Union[str, None] = None
-#     price: float
-
 class ChatRoom(BaseModel):
     roomId: int
     roomName: str
+    folderId: int
+    created_time: Optional[datetime] = None
 
 class ChatRoomRequest(BaseModel):
     userId: int
     urls: List[str]
 
 class ChatRoomResponse(BaseModel):
-    roomId:int
-
-# @router.get("/")
-# async def read_root():
-#     return "This is root path from MyAPI"
-
-# @router.get("/items/{item_id}")
-# async def read_item(item_id: int, q: Union[str,  None] = None):
-#     return {"item_id": item_id, "q": q}
-
-# @router.post("/items/")
-# async def create_item(item: Item):
-#     return item
-
-# @router.put("/items/{item_id}")
-# async def update_item(item_id: int, item: Item):
-#     result = {"item_id": item_id, **item.dict()}
-
-# @router.delete("/items/{item_id}")
-# def delete_item(item_id: int):
-#     return {"deleted": item_id}
+    roomId: int
 
 def get_db():
     db = database.SessionLocal()
@@ -58,34 +40,20 @@ def get_db():
     finally:
         db.close()
 
-@router.on_event("startup")
-def startup_event():
-    database.create_tables()
-
-# @router.post("/")
-# async def create_chatroom(chatroom: schema.ChatRoomCreate, 
-#                           db: Session = Depends(get_db)):
-#     db_chatroom = crud.create_chatroom(db, chatroom)
-#     db_chatroom["roomId"] = db_chatroom.pop["room_id"]
-#     return db_chatroom
-
 @router.post("/", response_model=ChatRoomResponse)
 async def create_chatroom(request: ChatRoomRequest, 
-                          chatroom: schema.ChatRoomCreate, 
                           db: Session = Depends(get_db)):
-    #
-    # Call userId = request.userId CRUD fuction
-    #
-    userId = 'test@ringchat.ai'
-
-    #
-    # Create chatroom record to DB
-    #
+    
+    now_utc = datetime.now()
+    kst_offset = timedelta(hours=9)
+    now_kst = now_utc + kst_offset
+    
+    chatroom = ChatRooms(user_id=request.userId,
+                         created_time=now_kst,
+                         folder_id=1,
+                         room_name=f'New Chat\n{now_kst.strftime("%Y-%m-%d %H:%M:%S")}')
+    
     db_chatroom = crud.create_chatroom(db, chatroom)
-    roomId = db_chatroom['room_id']
+    roomId = db_chatroom.room_id
 
-    chatrooms_data = {}
-    chatrooms_data[userId].append({"roomId": roomId, "roomName": f'Chat Room {roomId}'})
-    print(chatrooms_data)
-
-    return {'roomId': roomId}
+    return {"roomId": roomId}

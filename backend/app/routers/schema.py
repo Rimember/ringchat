@@ -1,29 +1,25 @@
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 
-# class ItemBase(BaseModel):
-#     name: str
-#     description: str
-#     price: int
-
-# class ItemCreate(ItemBase):
-#     pass
-
-# class Item(ItemBase):
-#     id: int
-
-#     class Config:
-#         orm_mode = True
 
 class ChatRoomBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     room_name: str
-    #bookmark: bool
-    #links: str
+    user_id: int
+    folder_id: int
+    created_time: Optional[datetime] = None
+
 
 class ChatRoomCreate(ChatRoomBase):
+    room_id: int
     pass
 
 class ChatRoom(ChatRoomBase):
-    room_id: int
+    user_id: int
+    folder_id: int
+    created_time: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

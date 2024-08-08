@@ -13,30 +13,6 @@ from app.routers.database import DB_USER
 
 db_user = DB_USER.lower()
 
-
-# class Item(Base):
-#     __tablename__ = "items"
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     name = Column(String(30))
-#     description = Column(String(30))
-#     price = Column(Integer)
-
-####################################
-#     For reference to old code 
-####################################
-# class ChatRoom(Base):
-#     __tablename__ = "chatrooms"
-
-#     r_id = Column(NUMBER, primary_key=True)
-#     room_name = Column(VARCHAR2(255), nullable=False)
-#     bookmark = Column(NUMBER, default=0)
-#     created_date = Column(TIMESTAMP, nullable=False)
-#     u_id = Column(NUMBER, ForeignKey("Users.u_id"), nullable=False)
-
-#     users = relationship("Users", back_populates="chat_rooms")
-#     messages = relationship("Message", back_populates="chat_room")
-#     links = relationship("Link", secondary="Link_ChatRoom", back_populates="chat_rooms")
-
 class JsonType(TypeDecorator):
     impl = VARCHAR2(4000)  # Setting appropriate VARCHAR2 size
     cache_ok = True  # Enable caching (improves performance)
