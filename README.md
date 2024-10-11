@@ -21,14 +21,12 @@
 
 3️⃣ `Organize scattered answers` 
 
-<details open>
-<summary>
- Features
-</summary> <br />
 
-https://github.com/user-attachments/assets/5250cb1d-e67f-437b-a257-59d5d73709c2
 
-</details>
+
+https://github.com/user-attachments/assets/80d40e23-d7c5-4d8c-8ccd-055ba77d86cd
+
+
 
 
 ## <div align="center">Service architecture</div>
