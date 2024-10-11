@@ -45,8 +45,10 @@ jobs:
 
               const labels = pr.labels.map(label => label.name);
               let timeLimit = null;
-
-              if (labels.includes("urgent")) {
+              
+              if (labels.includes("silence")) {
+                continue;
+              } else if (labels.includes("urgent")) {
                 timeLimit = labelTimeLimits["urgent"];
               } else if (labels.includes("medium")) {
                 timeLimit = labelTimeLimits["medium"];
