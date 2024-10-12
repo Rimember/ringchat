@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_IMAGE_NAME: "rimember/ringchat"
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,6 +46,9 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -i server-key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
+          export DATABASE_URL='${{ secrets.DATABASE_URL }}' &&
+          export OPENAI_API_KEY='${{ secrets.OPENAI_API_KEY }}' &&
+          export SECRET_KEY='${{ secrets.SECRET_KEY }}' &&
           cd /home/ubuntu &&
           docker-compose pull &&
           docker-compose up -d &&
