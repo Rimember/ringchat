@@ -44,7 +44,7 @@ jobs:
   
       - name: Copy files to server
         run: |
-          scp -i server-key.pem -r * ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu/ringchat
+          scp -i server-key.pem -o StrictHostKeyChecking=no -r * ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu/ringchat
 
       - name: Deploy to Server
         run: |
