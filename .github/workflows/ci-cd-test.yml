@@ -44,12 +44,12 @@ jobs:
   
       - name: Copy files to server
         run: |
-          scp -i server-key.pem -o StrictHostKeyChecking=no -r * ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu/ringchat
+          scp -i server-key.pem -o StrictHostKeyChecking=no -r * ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu
 
       - name: Deploy to Server
         run: |
           ssh -i server-key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
-          cd /home/ubuntu/ringchat &&
+          cd /home/ubuntu &&
           docker-compose pull &&
           docker-compose up -d &&
           docker-compose exec backend alembic upgrade head
