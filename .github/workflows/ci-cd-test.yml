@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - ci-cd-test
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE_NAME: "rimember/ringchat"
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Frontend Docker Image
+        run: |
+          docker build -t $DOCKER_IMAGE_NAME-frontend:latest ./frontend
+
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t $DOCKER_IMAGE_NAME-backend:latest ./backend
+
+      - name: Login to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Frontend Docker Image to Docker Hub
+        run: |
+          docker push $DOCKER_IMAGE_NAME-frontend:latest
+
+      - name: Push Backend Docker Image to Docker Hub
+        run: |
+          docker push $DOCKER_IMAGE_NAME-backend:latest
+
+      - name: Deploy to Server
+        run: |
+          ssh -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
+          cd ringchat &&
+          docker-compose pull &&
+          docker-compose up -d &&
+          docker-compose exec backend alembic upgrade head
+          "
