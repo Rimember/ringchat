@@ -37,9 +37,14 @@ jobs:
         run: |
           docker push $DOCKER_IMAGE_NAME-backend:latest
 
+      - name: Create SSH key file
+        run: |
+          echo "${{ secrets.SERVER_SSH_KEY }}" > server-key.pem
+          chmod 600 server-key.pem
+
       - name: Deploy to Server
         run: |
-          ssh -i ${{ secrets.SERVER_SSH_KEY }} -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
+          ssh -i server-key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
           cd ringchat &&
           docker-compose pull &&
           docker-compose up -d &&
