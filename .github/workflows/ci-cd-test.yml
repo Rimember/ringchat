@@ -42,10 +42,14 @@ jobs:
           echo "${{ secrets.SERVER_SSH_KEY }}" > server-key.pem
           chmod 600 server-key.pem
   
+      - name: Copy files to server
+        run: |
+          scp -i server-key.pem -r * ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu/ringchat
+
       - name: Deploy to Server
         run: |
           ssh -i server-key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.SERVER_IP}} "
-          cd ringchat &&
+          cd /home/ubuntu/ringchat &&
           docker-compose pull &&
           docker-compose up -d &&
           docker-compose exec backend alembic upgrade head
