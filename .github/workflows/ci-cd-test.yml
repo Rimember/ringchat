@@ -16,11 +16,11 @@ jobs:
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t $DOCKER_IMAGE_NAME-frontend:latest ./frontend
+          docker build --no-cache -t $DOCKER_IMAGE_NAME-frontend:latest ./frontend
 
       - name: Build Backend Docker Image
         run: |
-          docker build -t $DOCKER_IMAGE_NAME-backend:latest ./backend
+          docker build --no-cache -t $DOCKER_IMAGE_NAME-backend:latest ./backend
 
       - name: Login to Docker Hub
         run: |
