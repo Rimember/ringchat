@@ -1,23 +1,28 @@
-FROM python:3.10-slim
+# 1단계: 빌드 환경
+FROM python:3.10-slim AS builder
 
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /workdir/backend
 
-# RUN pip install -U pip && pip install -U poetry
+RUN pip install --no-cache-dir -U pip
 
-# RUN poetry config virtualenvs.create false \
-#     && poetry config virtualenvs.in-project false
+COPY requirements.txt .
 
-# COPY pyproject.toml ./
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# RUN poetry install --no-root --no-interaction
+# 2단계: 최종 이미지
+FROM python:3.10-slim
 
-RUN pip install -U pip
+ENV PYTHONUNBUFFERED=1 \
+    PATH=/root/.local/bin:$PATH
 
-COPY requirements.txt ./
+WORKDIR /workdir/backend
 
-RUN pip install -r requirements.txt --default-timeout=600
+COPY --from=builder /root/.local /root/.local
 
 COPY . .
 
