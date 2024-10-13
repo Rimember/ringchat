@@ -51,7 +51,7 @@ jobs:
           export SECRET_KEY='${{ secrets.SECRET_KEY }}' &&
           export NEXT_PUBLIC_API_URL='http://${{ secrets.SERVER_IP}}:8000/api' &&
           cd /home/ubuntu &&
-          docker system prune -a --volumes &&
+          docker system prune -a -f&&
           docker-compose pull &&
           docker-compose up -d &&
           docker-compose exec backend alembic upgrade head
