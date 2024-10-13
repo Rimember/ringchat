@@ -4,11 +4,13 @@ WORKDIR /workdir/frontend
 
 COPY package.json package-lock.json ./
 
-RUN npm install --frozen-lockfile --production
+RUN npm install --frozen-lockfile
 
 COPY . .
 
 RUN npm run build
+
+RUN npm prune --production
 
 EXPOSE 3000
 
