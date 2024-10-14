@@ -8,9 +8,8 @@ export class ErrorCode extends Error {
 }
 
 export async function fetchClient(path: string, options: RequestInit = {}) {
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
-  console.log(url)
-  console.log(`${process.env.NEXT_PUBLIC_API_URL}`)
+  // const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
+  const url = `http://3.35.229.132:8000/api${path}`
 
   const headers = new Headers({
     ...options.headers,
@@ -30,7 +29,8 @@ export async function fetchClient(path: string, options: RequestInit = {}) {
 }
 
 export async function fetchServer(path: string, options: RequestInit = {}) {
-  const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
+  // const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
+  const url = `http://backend:8000/api${path}`
 
   const headers = new Headers({
     ...options.headers,
