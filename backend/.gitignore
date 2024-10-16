@@ -28,6 +28,7 @@ alembic.ini
 
 # logging
 *.log
+logs
 
 # security
 *.pem
