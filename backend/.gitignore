@@ -28,6 +28,15 @@ alembic.ini
 
 # logging
 *.log
+logs
 
 # security
 *.pem
+
+# loki 
+chunks
+compactor
+rules
+tsdb-shipper-active
+tsdb-shipper-cache
+wal
