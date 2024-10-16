@@ -1,0 +1,32 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /workdir/backend/app/monitoring/promtail/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: backend
+    static_configs:
+    - targets:
+        - backend:8000
+      labels:
+        job: backend_logs
+        __path__: /workdir/backend/app/monitoring/logs/backend/**/**/*.log
+  - job_name: frontend
+    static_configs:
+    - targets:
+        - frontend:3000
+      labels:
+        job: frontend_logs
+        __path__: /workdir/backend/app/monitoring/logs/frontend/**/*.log
+  - job_name: db
+    static_configs:
+    - targets:
+        - db:5432
+      labels:
+        job: db_logs
+        __path__: /workdir/backend/app/monitoring/logs/db/**/*.log
