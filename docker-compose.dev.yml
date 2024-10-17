@@ -3,6 +3,7 @@ services:
     image: pgvector/pgvector:pg16
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./backend/init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
     ports:
       - "5432:5432"
     networks:
