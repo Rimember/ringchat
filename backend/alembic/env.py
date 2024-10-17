@@ -6,16 +6,37 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy import engine_from_config
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
 
 from app.db.models import Base
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-load_dotenv('.env.local')
-DB_URL = os.getenv('DATABASE_URL')
+
+# 환경 결정 (기본값 development) 
+env = os.getenv('ALEMBIC_ENV', 'development')
+
+# SQL query log 출력 여부 결정 
+if env == 'development': 
+    echo = True 
+else: 
+    echo = False 
+
+# 환경에 따른 환경설정 파일 결정 
+env_file = {
+    'development': '.env.local',    
+    'production': '.env.production'
+}.get(env, '.env')  # 둘 다 파일이 없을 경우 .env에서 가지고 옴
+
+load_dotenv(env_file)
+
+DB_URL = {
+    'development': os.getenv('DEV_DATABASE_URL'),
+    'production': os.getenv('PROD_DATABASE_URL')
+}.get(env, os.getenv('DATABASE_URL'))
+
+if not DB_URL:
+    raise ValueError(f"No database URL configured for the {env} environment.")
 
 config = context.config
 config.set_main_option('sqlalchemy.url', DB_URL)
@@ -75,13 +96,11 @@ async def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = AsyncEngine(
-        engine_from_config(
-            config.get_section(config.config_ini_section),
-            prefix="sqlalchemy.",
-            poolclass=pool.NullPool,
-            future=True,
-        )
+    url = config.get_main_option("sqlalchemy.url")
+    connectable = create_async_engine(
+        url,
+        echo=echo,
+        poolclass=pool.NullPool,
     )
 
     async with connectable.connect() as connection:
