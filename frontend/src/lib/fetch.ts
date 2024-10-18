@@ -28,7 +28,7 @@ export async function fetchClient(path: string, options: RequestInit = {}) {
 }
 
 export async function fetchServer(path: string, options: RequestInit = {}) {
-  const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
 
   const headers = new Headers({
     ...options.headers,
