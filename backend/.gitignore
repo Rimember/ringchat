@@ -22,10 +22,6 @@ venv/
 # pycache
 __pycache__/
 
-# alembic
-alembic/
-alembic.ini
-
 # logging
 *.log
 
