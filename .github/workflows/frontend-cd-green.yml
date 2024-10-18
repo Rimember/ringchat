@@ -7,11 +7,14 @@ on:
     paths:
       - 'frontend/**'
 
+env:
+  DOCKER_IMAGE_NAME: rimember/ringchat-frontend:green-latest
+  DOCKER_CONTAINER_NAME: frontend-green
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_IMAGE_NAME: "rimember/ringchat-frontend:green-latest"
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,11 +30,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $DOCKER_IMAGE_NAME ./frontend
+          docker build -t ${{ env.DOCKER_IMAGE_NAME }} ./frontend
 
       - name: Push Docker image to Docker Hub
         run: |
-          docker push $DOCKER_IMAGE_NAME
+          docker push ${{ env.DOCKER_IMAGE_NAME }}
 
       - name: Deploy Green container on remote server
         uses: appleboy/ssh-action@v1.1.0
@@ -40,7 +43,8 @@ jobs:
           host: ${{ secrets.FRONT_SERVER_HOST }}
           username: ubuntu
           script: |
-            echo $DOCKER_IMAGE_NAME
-            docker pull $DOCKER_IMAGE_NAME
-            docker run -d --name frontend-green -p 3000:3000 \
+            docker stop ${{ env.DOCKER_CONTAINER_NAME }} || true
+            docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
+            docker pull ${{ env.DOCKER_IMAGE_NAME }}
+            docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 3000:3000 \
               -e ${{ secrets.NEXT_PUBLIC_API_URL }} $DOCKER_IMAGE_NAME
