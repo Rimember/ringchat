@@ -16,6 +16,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.llm.message_task import store
+from app.utils.logging import logger
 
 
 def get_rag_chain(document_text: str):
@@ -115,6 +116,7 @@ def get_langchain_response(user_message: str, chat_room_id: int):
         )
 
     except Exception as e:
+        logger.error("Error generating answer: ", exc_info={e})
         raise RuntimeError(f"Error generating answer: {e}")
 
 

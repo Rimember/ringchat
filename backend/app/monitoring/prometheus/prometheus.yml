@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s # 15초마다 데이터 가지고옴 / default = 1m
+  scrape_timeout: 15s # 데이터를 가지고 오는 작업을 15초간 기다릴 수 있음 / default = 10s
+  evaluation_interval: 2m # 알람 규칙이 평가되는 빈도 (2분에 한번) / default = 1m
+
+  external_labels:
+    monitor: 'backend-monitor'
+
+scrape_configs:
+  - job_name: 'backend'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    honor_labels: false
+    honor_timestamps: false
+    scheme: 'https'
+    static_configs:
+      - targets: ['backend:8000']
+
+  - job_name: 'node_exporter'
+    scrape_interval: 5s 
+    static_configs: 
+      - targets: ['node_exporter:9100']

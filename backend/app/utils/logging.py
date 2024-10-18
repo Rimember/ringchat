@@ -1,6 +1,10 @@
+import os 
 import logging
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime, timedelta, timezone
+from app.utils.file_system import PROJECT_ROOT
+from app.utils.file_system import ensure_dir
+from app.utils.file_system import combine_relative_path
 
 KST = timezone(timedelta(hours=9))
 
@@ -24,13 +28,30 @@ class KSTFormatter(logging.Formatter):
         return f"\n{divide}\n\n{log_message}"
 
 
+def get_folder_path(target_path, dt=None, type='error'):
+    if dt is None:
+        dt = datetime.now(KST)
+    log_dir = combine_relative_path(PROJECT_ROOT, 
+                                    target_path, 
+                                    dt.strftime('%Y-%m-%d'))
+    ensure_dir(log_dir)
+    return log_dir + os.sep + type + '.log'
+
+
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOG_LEVEL = logging.DEBUG
-LOG_FILE = "app.log"
+LOG_FILE = get_folder_path('app/monitoring/logs/backend')
 
 formatter = KSTFormatter(LOG_FORMAT)
 
-file_handler = RotatingFileHandler(LOG_FILE)
+# 핸들러 설정 (날짜별 회전 설정)
+file_handler = TimedRotatingFileHandler(
+    LOG_FILE,          
+    when="midnight", 
+    interval=1, 
+    backupCount=30, 
+    utc=False
+)
 file_handler.setLevel(LOG_LEVEL)
 file_handler.setFormatter(formatter)
 

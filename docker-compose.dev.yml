@@ -38,9 +38,74 @@ services:
     depends_on:
       - backend
 
+
+  grafana: 
+    image: grafana/grafana-enterprise:11.2.1-ubuntu
+    container_name: grafana
+    volumes:
+      - ./backend/app/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana_storage:/var/lib/grafana
+    env_file:
+      - ./backend/.env.monitoring
+    ports: 
+      - "3001:3000" 
+    networks:
+      - app-network
+    depends_on:
+      - backend
+      - prometheus
+      - loki
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.46.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    volumes:
+      - ./backend/app/monitoring/prometheus:/workdir/backend/app/monitoring/prometheus
+    command:
+      - "--config.file=/workdir/backend/app/monitoring/prometheus/prometheus.yml"
+    restart: unless-stopped
+
+  node_exporter: 
+    image: prom/node-exporter:v1.8.2
+    container_name: node_exporter   
+    ports: 
+      - "9100:9100"
+    networks:
+      - app-network
+
+  loki:
+    image: grafana/loki:2.8.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    networks:
+      - app-network
+    volumes:
+      - ./backend/app/monitoring/loki:/workdir/backend/app/monitoring/loki
+    command: -config.file=/workdir/backend/app/monitoring/loki/local-config.yaml
+    restart: always
+
+  promtail:
+    image: grafana/promtail:2.8.0
+    container_name: promtail
+    networks:
+      - app-network
+    volumes:
+      - ./backend/app/monitoring/promtail:/workdir/backend/app/monitoring/promtail
+      - ./backend/app/monitoring/promtail:/workdir/backend/app/monitoring/promtail
+      - ./backend/app/monitoring/logs:/workdir/backend/app/monitoring/logs
+    command: -config.file=/workdir/backend/app/monitoring/promtail/config.yml
+    restart: always
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   pgdata:
+  grafana_storage: {}
