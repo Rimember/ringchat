@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv(".env.local")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-COOKIE_EXPIRE_SECOND = int(os.getenv("COOKIE_EXPIRE_SECOND"))
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"), 1440)
+COOKIE_EXPIRE_SECOND = int(os.getenv("COOKIE_EXPIRE_SECOND"), 86400)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
