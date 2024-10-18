@@ -47,4 +47,5 @@ jobs:
             docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
             docker pull ${{ env.DOCKER_IMAGE_NAME }}
             docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 3000:3000 \
-              -e ${{ secrets.NEXT_PUBLIC_API_URL }} ${{ env.DOCKER_IMAGE_NAME }}
+              -e NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
+              ${{ env.DOCKER_IMAGE_NAME }}
