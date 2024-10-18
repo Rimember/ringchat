@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - release-test
+    paths:
+      - 'frontend/**'
 
 jobs:
   build-and-deploy:
@@ -15,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -25,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $DOCKER_IMAGE_NAME .
+          docker build -t $DOCKER_IMAGE_NAME ./frontend
 
       - name: Push Docker image to Docker Hub
         run: |
