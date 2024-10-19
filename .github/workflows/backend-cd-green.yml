@@ -30,7 +30,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.DOCKER_IMAGE_NAME }} ./backend
+          docker build --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} \
+            --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}} \
+            -t ${{ env.DOCKER_IMAGE_NAME }} ./backend
 
       - name: Push Docker image to Docker Hub
         run: |
@@ -46,8 +49,4 @@ jobs:
             docker stop ${{ env.DOCKER_CONTAINER_NAME }} || true
             docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
             docker pull ${{ env.DOCKER_IMAGE_NAME }}
-            docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 8000:8000 \
-              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} \
-              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}} \
-              ${{ env.DOCKER_IMAGE_NAME }}
+            docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 8000:8000 ${{ env.DOCKER_IMAGE_NAME }}
