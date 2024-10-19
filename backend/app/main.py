@@ -42,12 +42,10 @@ async def custom_http_exception_handler(req: Request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content=content)
 
 
-prefix = "/api"
-
-app.include_router(auth.router, prefix=prefix)
-app.include_router(me.router, prefix=prefix)
-app.include_router(folders.router, prefix=prefix)
-app.include_router(chatrooms.router, prefix=prefix)
-app.include_router(messages.router, prefix=prefix)
-app.include_router(links.router, prefix=prefix)
-app.include_router(rating.router, prefix=prefix)
+app.include_router(auth.router)
+app.include_router(me.router)
+app.include_router(folders.router)
+app.include_router(chatrooms.router)
+app.include_router(messages.router)
+app.include_router(links.router)
+app.include_router(rating.router)
