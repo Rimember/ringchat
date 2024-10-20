@@ -1,4 +1,4 @@
-name: Frontend Release Green Deployment
+name: Release CD Frontend
 
 on:
   push:
@@ -8,8 +8,10 @@ on:
       - 'frontend/**'
 
 env:
-  DOCKER_IMAGE_NAME: rimember/ringchat-frontend:green-latest
-  DOCKER_CONTAINER_NAME: frontend-green
+  DOCKER_IMAGE_NAME: rimember/ringchat-frontend-prod:latest
+  DOCKER_CONTAINER_NAME: frontend-prod
+  PORT_PROD1: 3001
+  PORT_PROD2: 3002
 
 jobs:
   build-and-deploy:
@@ -27,6 +29,22 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      
+      - name: Determine new port
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
+          host: ${{ secrets.FRONT_SERVER_HOST }}
+          username: ubuntu
+          script: |
+            if docker ps | grep -q 0.0.0.0:${{ env.PORT_PROD1 }}; then
+              echo "NEW_PORT=${{ env.PORT_PROD2 }}" >> "$GITHUB_ENV"
+              echo "NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}2" >> "$GITHUB_ENV"
+            else
+              echo "NEW_PORT=${{ env.PORT_PROD1 }}" >> "$GITHUB_ENV"
+              echo "NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}1" >> "$GITHUB_ENV"
+            fi
+        continue-on-error: false
 
       - name: Build Docker image
         run: |
@@ -44,7 +62,7 @@ jobs:
           host: ${{ secrets.FRONT_SERVER_HOST }}
           username: ubuntu
           script: |
-            docker stop ${{ env.DOCKER_CONTAINER_NAME }} || true
-            docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
+            docker stop $NEW_CONTAINER || true
+            docker rm $NEW_CONTAINER || true
             docker pull ${{ env.DOCKER_IMAGE_NAME }}
-            docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 3000:3000 ${{ env.DOCKER_IMAGE_NAME }}
+            docker run -d --name $NEW_CONTAINER -p $NEW_PORT:3000 ${{ env.DOCKER_IMAGE_NAME }}

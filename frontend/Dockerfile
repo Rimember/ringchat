@@ -2,7 +2,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 COPY package.json package-lock.json ./
 RUN apk add --no-cache libc6-compat && npm ci
@@ -13,6 +13,7 @@ RUN npm run build
 
 FROM node:18-alpine AS runner
 WORKDIR /app
+
 ENV NODE_ENV production PORT 3000
 
 RUN addgroup --system --gid 1001 nodejs && \
