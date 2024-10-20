@@ -1,4 +1,4 @@
-name: Backend Release Green Deployment
+name: Release CD Backend
 
 on:
   push:
@@ -8,8 +8,10 @@ on:
       - 'backend/**'
 
 env:
-  DOCKER_IMAGE_NAME: rimember/ringchat-backend:green-latest
-  DOCKER_CONTAINER_NAME: backend-green
+  DOCKER_IMAGE_NAME: rimember/ringchat-backend-prod:latest
+  DOCKER_CONTAINER_NAME: backend-prod
+  PORT_PROD1: 8001
+  PORT_PROD2: 8002
 
 jobs:
   build-and-deploy:
@@ -43,10 +45,18 @@ jobs:
           host: ${{ secrets.BACK_SERVER_HOST }}
           username: ubuntu
           script: |
-            docker stop ${{ env.DOCKER_CONTAINER_NAME }} || true
-            docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
+            if docker ps | grep -q 0.0.0.0:${{ env.PORT_PROD1 }}; then
+              NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}2
+              NEW_PORT=${{ env.PORT_PROD2 }}
+            else
+              NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}1
+              NEW_PORT=${{ env.PORT_PROD1 }}
+            fi
+
+            docker stop $NEW_CONTAINER || true
+            docker rm $NEW_CONTAINER || true
             docker pull ${{ env.DOCKER_IMAGE_NAME }}
-            docker run -d --name ${{ env.DOCKER_CONTAINER_NAME }} -p 8000:8000 \
+            docker run -d --name $NEW_CONTAINER -p $NEW_PORT:8000 \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} \
               -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}} \
