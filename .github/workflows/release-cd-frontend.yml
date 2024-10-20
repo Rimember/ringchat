@@ -29,22 +29,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      
-      - name: Determine new port
-        uses: appleboy/ssh-action@v1.1.0
-        with:
-          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
-          host: ${{ secrets.FRONT_SERVER_HOST }}
-          username: ubuntu
-          script: |
-            if docker ps | grep -q 0.0.0.0:${{ env.PORT_PROD1 }}; then
-              echo "NEW_PORT=${{ env.PORT_PROD2 }}" >> "$GITHUB_ENV"
-              echo "NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}2" >> "$GITHUB_ENV"
-            else
-              echo "NEW_PORT=${{ env.PORT_PROD1 }}" >> "$GITHUB_ENV"
-              echo "NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}1" >> "$GITHUB_ENV"
-            fi
-        continue-on-error: false
 
       - name: Build Docker image
         run: |
@@ -62,6 +46,14 @@ jobs:
           host: ${{ secrets.FRONT_SERVER_HOST }}
           username: ubuntu
           script: |
+            if docker ps | grep -q 0.0.0.0:${{ env.PORT_PROD1 }}; then
+              NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}2
+              NEW_PORT=${{ env.PORT_PROD2 }}
+            else
+              NEW_CONTAINER=${{ env.DOCKER_CONTAINER_NAME }}1
+              NEW_PORT=${{ env.PORT_PROD1 }}
+            fi
+            
             docker stop $NEW_CONTAINER || true
             docker rm $NEW_CONTAINER || true
             docker pull ${{ env.DOCKER_IMAGE_NAME }}
