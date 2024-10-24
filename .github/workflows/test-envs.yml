@@ -4,25 +4,47 @@ on:
     branches:
       - release-test
 
+env:
+  FRONT_PROD1_PORT: 3001
+  FRONT_PROD2_PORT: 3002
+  BACK_PROD1_PORT: 8001
+  BACK_PROD2_PORT: 8002
+
 jobs:
-  test-envs:
+  check-ports:
     runs-on: ubuntu-latest
+    outputs:
+      front-green-port: ${{ steps.green-ports.outputs.FRONT_GREEN_PORT }}
+      back-green-port: ${{ steps.green-ports.outputs.BACK_GREEN_PORT }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create SSH key file
+      - name: Create frontend server ssh key file
         run: |
           echo "${{ secrets.FRONT_SERVER_SSH_KEY }}" > ~/fkey.pem
           chmod 400 ~/fkey.pem
       
-      - name: Check container port
-        run: |
-          BLUE_PORT=$(ssh -i ~/fkey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
+      - name: Check blue container port in frontend server
+        id: green-ports
+        run: | 
+          FRONT_BLUE_PORT=$(ssh -i ~/fkey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
           "docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print \$2}' | awk -F '}' '{print \$1}'")
-          echo "$BLUE_PORT"
-          echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_ENV
-      
-      - name: Check env
+
+          echo "Current frontend container port: $FRONT_BLUE_PORT"
+
+          if [ "$FRONT_BLUE_PORT" = "${{ env.FRONT_PROD1_PORT }}" ]; then
+            echo "FRONT_GREEN_PORT=${{ env.FRONT_PROD2_PORT }}" >> $GITHUB_OUTPUT
+            echo "BACK_GREEN_PORT=${{ env.BACK_PROD2_PORT }}" >> $GITHUB_OUTPUT
+          else
+            echo "FRONT_GREEN_PORT=${{ env.FRONT_PROD1_PORT }}" >> $GITHUB_OUTPUT
+            echo "BACK_GREEN_PORT=${{ env.BACK_PROD1_PORT }}" >> $GITHUB_OUTPUT
+  
+  check-envs:
+    runs-on: ubuntu-latest
+    needs: check-ports
+    steps:
+      - name: Check other job's env
         run: |
-          echo "port: ${{ env.BLUE_PORT }}"
+          echo "${{ needs.check-ports.outputs.front-green-port }}"
+          echo "${{ needs.check-ports.outputs.back-green-port }}"
