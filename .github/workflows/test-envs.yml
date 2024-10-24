@@ -13,13 +13,14 @@ jobs:
       
       - name: Check container port
         uses: appleboy/ssh-action@v1.1.0
+        id: check-port
         with:
           key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
           host: ${{ secrets.FRONT_SERVER_HOST }}
           username: ubuntu
           script: |
             BLUE_PORT=$( docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print $2}' | awk -F '}' '{print $1}' )
-            echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_ENV
+            echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_OUTPUT
       
       - name: Check env
         uses: appleboy/ssh-action@v1.1.0
@@ -29,4 +30,4 @@ jobs:
           username: ubuntu
           allenvs: true
           script: |
-            echo "${{ env.BLUE_PORT }}"
+            echo "${{ steps.check-port.outputs.BLUE_PORT }}"
