@@ -10,6 +10,10 @@ env:
   FRONT_PROD2_PORT: 3002
   BACK_PROD1_PORT: 8001
   BACK_PROD2_PORT: 8002
+  FRONT_DOCKER_IMAGE: rimember/ringchat-frontend-prod:latest
+  BACK_DOCKER_IMAGE: rimember/ringchat-backend-prod:latest
+  FRONT_DOCKER_CONTAINER: frontend-green
+  BACK_DOCKER_CONTAINER: backend-green
 
 jobs:
   check-envs:
@@ -45,9 +49,6 @@ jobs:
   deploy-frontend-green:
     runs-on: ubuntu-latest
     needs: check-envs
-    env:
-      API_URL: ${{ needs.check-envs.outputs.api-url }}
-      DOCKER_IMAGE: rimember/ringchat-frontend-prod:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,32 +63,30 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build frontend docker image
-        run: docker build --build-arg NEXT_PUBLIC_API_URL=$API_URL -t $DOCKER_IMAGE ./frontend
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=${{ needs.check-envs.outputs.api-url }} \
+            -t ${{ env.FRONT_DOCKER_IMAGE }} ./frontend
 
       - name: Push frontend docker image
-        run: docker push $DOCKER_IMAGE
+        run: docker push ${{ env.FRONT_DOCKER_IMAGE }}
 
       - name: Deploy frontend green container on EC2
         uses: appleboy/ssh-action@v1.1.0
-        env:
-          HOST_PORT: ${{ needs.check-envs.outputs.front-green-port }}
-          DOCKER_IMAGE: $DOCKER_IMAGE
-          DOCKER_CONTAINER: frontend-green
         with:
           key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
           host: ${{ secrets.FRONT_SERVER_HOST }}
           username: ubuntu
-          envs: HOST_PORT, DOCKER_IMAGE, DOCKER_CONTAINER
           script: |
-            docker stop $DOCKER_CONTAINER || true
-            docker rm $DOCKER_CONTAINER || true
-            docker run -d --name $DOCKER_CONTAINER -p $HOST_PORT:3000 $DOCKER_IMAGE
+            docker stop ${{ env.FRONT_DOCKER_CONTAINER }} || true
+            docker rm ${{ env.FRONT_DOCKER_CONTAINER }} || true
+            docker run -d --name ${{ env.FRONT_DOCKER_CONTAINER }} \
+              -p ${{ needs.check-envs.outputs.front-green-port }}:3000 \
+              ${{ env.FRONT_DOCKER_IMAGE }}
 
   deploy-backend-green:
     runs-on: ubuntu-latest
     needs: check-envs
-    env:
-      DOCKER_IMAGE: rimember/ringchat-backend-prod:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -102,27 +101,23 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build backend docker image
-        run: docker build -t $DOCKER_IMAGE ./backend
+        run: docker build -t ${{ env.BACK_DOCKER_IMAGE }} ./backend
 
       - name: Push backend docker image
-        run: docker push $DOCKER_IMAGE
+        run: docker push ${{ env.BACK_DOCKER_IMAGE }}
 
       - name: Deploy backend green container on EC2
         uses: appleboy/ssh-action@v1.1.0
-        env:
-          HOST_PORT: ${{ needs.check-envs.outputs.back-green-port }}
-          DOCKER_IMAGE: $DOCKER_IMAGE
-          DOCKER_CONTAINER: backend-green
         with:
           key: ${{ secrets.BACK_SERVER_SSH_KEY }}
           host: ${{ secrets.BACK_SERVER_HOST }}
           username: ubuntu
-          envs: HOST_PORT, DOCKER_IMAGE, DOCKER_CONTAINER
           script: |
-            docker stop $DOCKER_CONTAINER || true
-            docker rm $DOCKER_CONTAINER || true
-            docker run -d --name $DOCKER_CONTAINER -p $HOST_PORT:8000 \
+            docker stop ${{ env.BACK_DOCKER_CONTAINER }} || true
+            docker rm ${{ env.BACK_DOCKER_CONTAINER }} || true
+            docker run -d --name ${{ env.BACK_DOCKER_CONTAINER }} \
+              -p ${{ needs.check-envs.outputs.back-green-port }}:8000 \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} \
               -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}} \
-              $DOCKER_IMAGE
+              ${{ env.BACK_DOCKER_IMAGE }}
