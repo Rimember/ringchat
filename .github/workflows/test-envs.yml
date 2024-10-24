@@ -1,0 +1,30 @@
+name: Test Envs
+on:
+  workflow_dispatch:
+
+jobs:
+  test-envs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check container port
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
+          host: ${{ secrets.FRONT_SERVER_HOST }}
+          username: ubuntu
+          script: |
+            BLUE_PORT=$( docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print $2}' | awk -F '}' '{print $1}' )
+            echo "$BLUE_PORT" >> $GITHUB_ENV
+      
+      - name: Check env
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
+          host: ${{ secrets.FRONT_SERVER_HOST }}
+          username: ubuntu
+          allenvs: true
+          script: |
+            echo "${{ env.BLUE_PORT }}"
