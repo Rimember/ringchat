@@ -24,4 +24,4 @@ jobs:
       
       - name: Check env
         run: |
-          echo "${{ steps.check-port.outputs }}"
+          echo "${{ steps.check-port.outputs.result }}"
