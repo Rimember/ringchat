@@ -23,11 +23,5 @@ jobs:
             echo "$BLUE_PORT"
       
       - name: Check env
-        uses: appleboy/ssh-action@v1.1.0
-        with:
-          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
-          host: ${{ secrets.FRONT_SERVER_HOST }}
-          username: ubuntu
-          allenvs: true
-          script: |
-            echo "${{ steps.check-port.outputs.stdout }}"
+        run: |
+          echo "${{ steps.check-port.outputs.stdout }}"
