@@ -12,16 +12,12 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Check container port
-        uses: appleboy/ssh-action@v1.1.0
-        id: check-port
-        with:
-          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
-          host: ${{ secrets.FRONT_SERVER_HOST }}
-          username: ubuntu
-          script: |
-            BLUE_PORT=$( docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print $2}' | awk -F '}' '{print $1}' )
-            echo "$BLUE_PORT"
-      
-      - name: Check env
         run: |
-          echo "${{ steps.check-port.outputs.result }}"
+          BLUE_PORT=$(ssh -o StrictHostKeyChecking=no -i ${{ secrets.FRONT_SERVER_SSH_KEY }} ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
+          "docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print \$2}' | awk -F '}' '{print \$1}'")
+          echo "BLUE_PORT=$BLUE_PORT"
+          echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_ENV
+
+      - name: Use BLUE_PORT variable
+        run: |
+          echo "The blue container is running on port: ${{ env.BLUE_PORT }}"
