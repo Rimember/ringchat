@@ -39,6 +39,7 @@ jobs:
           else
             echo "FRONT_GREEN_PORT=${{ env.FRONT_PROD1_PORT }}" >> $GITHUB_OUTPUT
             echo "BACK_GREEN_PORT=${{ env.BACK_PROD1_PORT }}" >> $GITHUB_OUTPUT
+          fi
   
   check-envs:
     runs-on: ubuntu-latest
