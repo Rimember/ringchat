@@ -19,7 +19,7 @@ jobs:
           username: ubuntu
           script: |
             BLUE_PORT=$( docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print $2}' | awk -F '}' '{print $1}' )
-            echo "$BLUE_PORT" >> $GITHUB_ENV
+            echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_ENV
       
       - name: Check env
         uses: appleboy/ssh-action@v1.1.0
