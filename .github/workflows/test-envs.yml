@@ -11,13 +11,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Create SSH key file
+        run: |
+          echo "${{ secrets.FRONT_SERVER_SSH_KEY }}" > ~/fkey.pem
+          chmod 400 ~/fkey.pem
+      
       - name: Check container port
         run: |
-          BLUE_PORT=$(ssh -o StrictHostKeyChecking=no -i ${{ secrets.FRONT_SERVER_SSH_KEY }} ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
+          BLUE_PORT=$(ssh -i ~/fkey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
           "docker inspect --format='{{.HostConfig.PortBindings}}' frontend-prod1 | awk '{print \$2}' | awk -F '}' '{print \$1}'")
-          echo "BLUE_PORT=$BLUE_PORT"
+          echo "$BLUE_PORT"
           echo "BLUE_PORT=$BLUE_PORT" >> $GITHUB_ENV
-
-      - name: Use BLUE_PORT variable
+      
+      - name: Check env
         run: |
-          echo "The blue container is running on port: ${{ env.BLUE_PORT }}"
+          echo "port: ${{ env.BLUE_PORT }}"
