@@ -83,6 +83,7 @@ jobs:
           script: |
             docker stop ${{ env.FRONT_DOCKER_CONTAINER }} || true
             docker rm ${{ env.FRONT_DOCKER_CONTAINER }} || true
+            docker pull ${{ env.FRONT_DOCKER_IMAGE }}
             docker run -d --name ${{ env.FRONT_DOCKER_CONTAINER }} \
               -p ${{ needs.check-ports.outputs.front-green-port }}:3000 \
               ${{ env.FRONT_DOCKER_IMAGE }}
@@ -118,6 +119,7 @@ jobs:
           script: |
             docker stop ${{ env.BACK_DOCKER_CONTAINER }} || true
             docker rm ${{ env.BACK_DOCKER_CONTAINER }} || true
+            docker pull ${{ env.BACK_DOCKER_IMAGE }}
             docker run -d --name ${{ env.BACK_DOCKER_CONTAINER }} \
               -p ${{ needs.check-ports.outputs.back-green-port }}:8000 \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
