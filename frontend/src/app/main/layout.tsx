@@ -24,8 +24,7 @@ export default async function MainLayout({
 
   try {
     const host = headers().get("host");
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-    const domain = host ? `${protocol}://${host}` : "";
+    const domain = host ? `https://${host}` : "";
 
     [email, folders, noFolderChatRooms] = await Promise.all([
       fetchEmail({ domain: domain, accessToken: accessToken.value }),

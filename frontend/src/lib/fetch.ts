@@ -8,9 +8,11 @@ export class ErrorCode extends Error {
 }
 
 export async function fetchClient(path: string, options: RequestInit = {}) {
-  // const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
   const domain = typeof window !== "undefined" ? window.location.origin : "";
-  const url = `${domain}/api${path}`;
+  const url =
+    process.env.NODE_ENV === "production"
+      ? `${domain}/api${path}`
+      : `${process.env.NEXT_PUBLIC_API_URL}${path}`;
 
   const headers = new Headers({
     ...options.headers,
@@ -34,8 +36,10 @@ export async function fetchServer(
   path: string,
   options: RequestInit = {},
 ) {
-  // const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
-  const url = `${domain}/api${path}`;
+  const url =
+    process.env.NODE_ENV === "production"
+      ? `${domain}/api${path}`
+      : `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
 
   const headers = new Headers({
     ...options.headers,
