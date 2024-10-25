@@ -34,7 +34,7 @@ export async function fetchServer(
   path: string,
   options: RequestInit = {},
 ) {
-  // const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
+  // const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}${path}`;
   const url = `${domain}/api${path}`;
 
   const headers = new Headers({
