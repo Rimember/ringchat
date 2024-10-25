@@ -64,9 +64,9 @@ jobs:
           FRONT_GREEN_PORT=${{ needs.check-ports.outputs.front-green-port }}
 
           if [ "$FRONT_GREEN_PORT" = "${{ env.FRONT_PROD1_PORT }}" ]; then
-            API_URL=${{ secrets.API_PROD1_URL }}
+            API_URL=${{ secrets.API_URL }}/prod1
           else
-            API_URL=${{ secrets.API_PROD2_URL }}
+            API_URL=${{ secrets.API_URL }}/prod2
           fi
 
           docker build --build-arg NEXT_PUBLIC_API_URL=$API_URL -t ${{ env.FRONT_DOCKER_IMAGE }} ./frontend

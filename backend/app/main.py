@@ -19,8 +19,6 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
-    "https://test.ringchat.site",
-    "https://www.ringchat.site",
 ]
 
 
