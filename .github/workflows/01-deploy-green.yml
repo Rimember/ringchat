@@ -60,16 +60,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build frontend docker image
-        run: |
-          FRONT_GREEN_PORT=${{ needs.check-ports.outputs.front-green-port }}
-
-          if [ "$FRONT_GREEN_PORT" = "${{ env.FRONT_PROD1_PORT }}" ]; then
-            API_URL=${{ secrets.API_URL }}/prod1
-          else
-            API_URL=${{ secrets.API_URL }}/prod2
-          fi
-
-          docker build --build-arg NEXT_PUBLIC_API_URL=$API_URL -t ${{ env.FRONT_DOCKER_IMAGE }} ./frontend
+        run: docker build -t ${{ env.FRONT_DOCKER_IMAGE }} ./frontend
 
       - name: Push frontend docker image
         run: docker push ${{ env.FRONT_DOCKER_IMAGE }}
@@ -126,3 +117,18 @@ jobs:
               -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY}} \
               -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}} \
               ${{ env.BACK_DOCKER_IMAGE }}
+
+  update-nginx-config:
+    runs-on: ubuntu-latest
+    needs: [check-ports, deploy-frontend-green, deploy-backend-green]
+    steps:
+      - name: Update Nginx config on server
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          key: ${{ secrets.FRONT_SERVER_SSH_KEY }}
+          host: ${{ secrets.FRONT_SERVER_HOST }}
+          username: ubuntu
+          script: |
+            sudo sed -i "/upstream frontend_green {/,/}/s/:\([0-9]\+\);/:${{ needs.check-ports.outputs.front-green-port }};/" /etc/nginx/sites-available/ringchat.site
+            sudo sed -i "/upstream backend_green {/,/}/s/:\([0-9]\+\);/:${{ needs.check-ports.outputs.back-green-port }};/" /etc/nginx/sites-available/ringchat.site
+            sudo systemctl reload nginx

@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { fetchEmail, fetchFolders, fetchNoFolderChatRooms } from "@/lib/api";
 import { ErrorCode } from "@/lib/fetch";
@@ -23,10 +23,17 @@ export default async function MainLayout({
   let email: string, folders: FolderData[], noFolderChatRooms: ChatRoomData[];
 
   try {
+    const host = headers().get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const domain = host ? `${protocol}://${host}` : "";
+
     [email, folders, noFolderChatRooms] = await Promise.all([
-      fetchEmail({ accessToken: accessToken.value }),
-      fetchFolders({ accessToken: accessToken.value }),
-      fetchNoFolderChatRooms({ accessToken: accessToken.value }),
+      fetchEmail({ domain: domain, accessToken: accessToken.value }),
+      fetchFolders({ domain: domain, accessToken: accessToken.value }),
+      fetchNoFolderChatRooms({
+        domain: domain,
+        accessToken: accessToken.value,
+      }),
     ]);
   } catch (error) {
     if (error instanceof ErrorCode && error.code === "UNAUTHORIZED") {

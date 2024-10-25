@@ -1,11 +1,16 @@
 import { ErrorCode, fetchServer } from "@/lib/fetch";
 
-export async function fetchEmail({ accessToken }: { accessToken: string }) {
+interface fetchProps {
+  domain: string;
+  accessToken: string;
+}
+
+export async function fetchEmail(props: fetchProps) {
   try {
-    const res = await fetchServer("/me", {
+    const res = await fetchServer(props.domain, "/me", {
       method: "GET",
       headers: {
-        Cookie: `access_token=${accessToken}`,
+        Cookie: `access_token=${props.accessToken}`,
       },
     });
 
@@ -23,12 +28,12 @@ export async function fetchEmail({ accessToken }: { accessToken: string }) {
   }
 }
 
-export async function fetchFolders({ accessToken }: { accessToken: string }) {
+export async function fetchFolders(props: fetchProps) {
   try {
-    const res = await fetchServer("/folders", {
+    const res = await fetchServer(props.domain, "/folders", {
       method: "GET",
       headers: {
-        Cookie: `access_token=${accessToken}`,
+        Cookie: `access_token=${props.accessToken}`,
       },
     });
 
@@ -44,16 +49,12 @@ export async function fetchFolders({ accessToken }: { accessToken: string }) {
   }
 }
 
-export async function fetchNoFolderChatRooms({
-  accessToken,
-}: {
-  accessToken: string;
-}) {
+export async function fetchNoFolderChatRooms(props: fetchProps) {
   try {
-    const res = await fetchServer("/chatrooms?folderId=0", {
+    const res = await fetchServer(props.domain, "/chatrooms?folderId=0", {
       method: "GET",
       headers: {
-        Cookie: `access_token=${accessToken}`,
+        Cookie: `access_token=${props.accessToken}`,
       },
     });
 
