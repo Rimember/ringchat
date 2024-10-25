@@ -1,0 +1,46 @@
+name: Switch Container Blue to Green
+
+on:
+  push:
+    branches:
+      - main-test
+
+jobs:
+  check-ports:
+    runs-on: ubuntu-latest
+    outputs:
+      front-blue-port: ${{ steps.ports.outputs.FRONT_BLUE_PORT }}
+      front-green-port: ${{ steps.ports.outputs.FRONT_GREEN_PORT }}
+      back-blue-port: ${{ steps.ports.outputs.BACK_BLUE_PORT }}
+      back-green-port: ${{ steps.ports.outputs.BACK_GREEN_PORT }}
+    steps:
+      - name: Create server ssh key files
+        run: |
+          echo "${{ secrets.FRONT_SERVER_SSH_KEY }}" > ~/fkey.pem
+          echo "${{ secrets.BACK_SERVER_SSH_KEY }}" > ~/bkey.pem
+          chmod 400 ~/fkey.pem ~/bkey.pem
+
+      - name: Check container ports
+        id: ports
+        run: |
+          declare -A servers=(
+            ["FRONT_BLUE_PORT"]="frontend-blue ${{ secrets.FRONT_SERVER_HOST }} ~/fkey.pem"
+            ["FRONT_GREEN_PORT"]="frontend-green ${{ secrets.FRONT_SERVER_HOST }} ~/fkey.pem"
+            ["BACK_BLUE_PORT"]="backend-blue ${{ secrets.BACK_SERVER_HOST }} ~/bkey.pem"
+            ["BACK_GREEN_PORT"]="backend-green ${{ secrets.BACK_SERVER_HOST }} ~/bkey.pem"
+          )
+
+          for port in "${!servers[@]}"; do
+            IFS=' ' read -r container host key <<< "${servers[$port]}"
+            port_value=$(ssh -i "$key" -o StrictHostKeyChecking=no ubuntu@"$host" \
+              "docker inspect --format='{{.HostConfig.PortBindings}}' $container | awk '{print \$2}' | awk -F '}' '{print \$1}'")
+
+            if [[ -z "$port_value" ]]; then
+              echo "Error: $port is not set" >&2
+              exit 1
+            fi
+            echo "$port=$port_value"
+            echo "$port=$port_value" >> $GITHUB_OUTPUT
+          done
+
+  
