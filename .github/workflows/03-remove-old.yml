@@ -31,7 +31,7 @@ jobs:
       - name: Remove old container
         run: |
           ssh -i ~/fkey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.FRONT_SERVER_HOST }} \
-            "docker stop frontend-old || true && docker rm frontend-old || true && docker image prune -y"
+            "docker stop frontend-old || true && docker rm frontend-old || true && docker image prune -f"
 
           ssh -i ~/bkey.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.BACK_SERVER_HOST }} \
-            "docker stop backend-old || true && docker rm backend-old || true && docker image prune -y"
+            "docker stop backend-old || true && docker rm backend-old || true && docker image prune -f"
