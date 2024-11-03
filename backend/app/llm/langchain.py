@@ -39,7 +39,6 @@ def get_rag_chain(document_text: str):
             "formulate a standalone question which can be understood "
             "without the chat history. Do NOT answer the question, "
             "just reformulate it if needed and otherwise return it as is."
-            "Please answer the question in Korean."
         )
         contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
@@ -67,6 +66,13 @@ def get_rag_chain(document_text: str):
                 MessagesPlaceholder("chat_history"),
                 ("user", "{input}"),
             ]
+        )
+
+        print("\nQA Prompt:")
+        print(
+            qa_prompt.format(
+                input="Sample user query", context="Sample context"
+            )
         )
 
         question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)

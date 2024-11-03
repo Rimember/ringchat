@@ -27,7 +27,11 @@ export default function ChatPage() {
 
       const result = await res.json();
       if (res.ok) {
-        setMessages(result.messages);
+        const sortedMessages: MessageData[] = result.messages.sort(
+          (a: MessageData, b: MessageData) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+        );
+        setMessages(sortedMessages);
       } else if (res.status == 401) {
         window.location.href = "/";
       } else {
