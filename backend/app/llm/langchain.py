@@ -68,10 +68,13 @@ def get_rag_chain(document_text: str):
             ]
         )
 
+        sample_chat_history = []
         print("\nQA Prompt:")
         print(
             qa_prompt.format(
-                input="Sample user query", context="Sample context"
+                input="Sample user query",
+                context="Sample context",
+                chat_history=sample_chat_history,
             )
         )
 
