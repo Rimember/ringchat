@@ -1,3 +1,4 @@
+import asyncpg
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -42,3 +43,14 @@ async def create_db_session():
 
 async def close_db_session(session):
     await session.close()
+    
+
+async def get_connection():
+    """PostgreSQL 데이터베이스에 직접 연결하고 연결 객체를 반환"""
+    conn = await asyncpg.connect(DATABASE_URL.replace('postgresql+asyncpg', 'postgresql'))
+    return conn
+
+
+async def close_connection(conn):
+    """PostgreSQL 연결 종료"""
+    await conn.close()

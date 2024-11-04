@@ -9,4 +9,9 @@ router = APIRouter(tags=["metrics"])
 @router.get('/metrics/backend')
 async def backend_metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-    
+
+
+@router.get('/metrics/postgres')
+async def postgres_metrics():
+    await record_pg_metrics()
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
