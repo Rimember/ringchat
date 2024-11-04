@@ -44,9 +44,8 @@ services:
     container_name: grafana
     volumes:
       - ./backend/app/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./backend/app/monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - grafana_storage:/var/lib/grafana
-    env_file:
-      - ./backend/.env.monitoring
     ports: 
       - "3001:3000" 
     networks:
@@ -99,6 +98,7 @@ services:
       - ./backend/app/monitoring/promtail:/workdir/backend/app/monitoring/promtail
       - ./backend/app/monitoring/promtail:/workdir/backend/app/monitoring/promtail
       - ./backend/app/monitoring/logs:/workdir/backend/app/monitoring/logs
+      - ./frontend/logs:/workdir/frontend/logs
     command: -config.file=/workdir/backend/app/monitoring/promtail/config.yml
     restart: always
 

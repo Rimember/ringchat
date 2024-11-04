@@ -34,3 +34,11 @@ export interface MessageData {
   is_user_message: boolean;
   created_at: string;
 }
+
+export interface WebVitalsMetric {
+  name: 'CLS' | 'LCP' | 'TTFB' | 'FCP' | 'INP'; // Web Vitals 메트릭 이름
+  value: number; // 메트릭 값
+  id: string;    // 고유 ID
+  delta: number; // 변화량 (delta)
+  path: string;  // 페이지 경로
+}
