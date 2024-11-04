@@ -32,6 +32,8 @@ flake8-pyproject = "^1.2.3"
 flake8-mutable = "^1.2.0"
 apscheduler = "^3.10.4"
 lxml-html-clean = "^0.2.2"
+prometheus-client = "^0.21.0"
+prometheus-fastapi-instrumentator = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
