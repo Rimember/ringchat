@@ -923,7 +923,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "TTFB"
+                "options": "web_vitals_ttfb (mean)"
               },
               "properties": [
                 {
@@ -951,7 +951,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "FCP"
+                "options": "web_vitals_fcp (mean)"
               },
               "properties": [
                 {
@@ -979,7 +979,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "LCP"
+                "options": "web_vitals_lcp (mean)"
               },
               "properties": [
                 {
@@ -1007,7 +1007,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "CLS"
+                "options": "web_vitals_cls (mean)"
               },
               "properties": [
                 {
@@ -1029,6 +1029,10 @@
                       }
                     ]
                   }
+                }, 
+                {
+                  "id": "unit",
+                  "value": "short"
                 }
               ]
             }

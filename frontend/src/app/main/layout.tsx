@@ -7,6 +7,7 @@ import { LinkProvider } from "@/context/LinkContext";
 import SideBar from "@/components/sidebar/SideBar";
 import TopBar from "@/components/topbar/TopBar";
 import InvalidToken from "@/components/common/InvalidToken";
+import WebVitalsClient from "@/components/web-vitals/WebVitalsClient"
 
 export default async function MainLayout({
   children,
@@ -39,6 +40,7 @@ export default async function MainLayout({
 
   return (
     <div className="flex flex-row h-full">
+      <WebVitalsClient />
       <SideBar
         initFolders={folders}
         initNoFolderChatRooms={noFolderChatRooms}

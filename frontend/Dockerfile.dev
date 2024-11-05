@@ -1,7 +1,7 @@
 FROM node:18-alpine
 WORKDIR /workdir/frontend
 
-ENV NODE_ENV=development
+ENV ENVIRONMENT=development
 
 COPY package.json package-lock.json ./
 RUN apk add --no-cache libc6-compat && npm ci
