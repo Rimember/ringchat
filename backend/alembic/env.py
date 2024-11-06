@@ -18,7 +18,7 @@ else:
 DATABASE_URL = get_env("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError(f"No database URL configured for the {get_env("ENVIRONMENT")} environment.")
+    raise ValueError(f"No database URL configured for the {get_env('ENVIRONMENT')} environment.")
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)

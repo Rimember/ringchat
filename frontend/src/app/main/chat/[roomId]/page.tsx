@@ -7,6 +7,7 @@ import { MessageData } from "@/lib/interfaces";
 import UserMessage from "@/components/chat/UserMessage";
 import AIMessage from "@/components/chat/AIMessage";
 import MessageInput from "@/components/chat/MessageInput";
+import WebVitalsClient from "@/components/web-vitals/WebVitalsClient"
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
@@ -127,6 +128,7 @@ export default function ChatPage() {
 
   return (
     <>
+      <WebVitalsClient />
       <div className="scroll-base space-y-5 px-10 py-4 select-text">
         {messages.map((message) =>
           message.is_user_message ? (

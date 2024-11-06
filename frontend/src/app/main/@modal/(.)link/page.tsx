@@ -11,6 +11,7 @@ import Select from "react-select";
 import { selectOptions, selectStyles } from "@/components/link/LinkSortingMenu";
 import Link from "@/components/link/Link";
 import { PiSpinnerGapBold } from "react-icons/pi";
+import WebVitalsClient from "@/components/web-vitals/WebVitalsClient"
 
 export default function LinkPage() {
   const [hasResult, setHasResult] = useState<boolean | null>(null);
@@ -82,6 +83,7 @@ export default function LinkPage() {
 
   return (
     <div className="fixed inset-0 flex-center bg-black bg-opacity-80">
+      <WebVitalsClient />
       <div className="flex flex-col w-3/5 h-4/5 space-y-2 p-4 bg-white rounded-lg overflow-scroll">
         <HiOutlineXMark
           className="icon-base self-end size-7 text-gray-hover"
